@@ -54,7 +54,7 @@ export class Product {
   @Prop()
   updatedAt: Date;
 
-  @Prop({ unique: true })
+  @Prop()
   sku: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Supplier' })

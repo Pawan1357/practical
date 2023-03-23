@@ -38,6 +38,26 @@ export class ProductsService {
       };
       const newSKU = sku(prodName, suppName, catName);
       console.log(newSKU);
+      const existingProduct = await this.prodModel.findOne({ sku: newSKU });
+      console.log('existingProduct', existingProduct);
+
+      // let newProduct: ProductDocument;
+      // if (existingProduct) {
+      //   newProduct = new this.prodModel(createProductDto);
+      //   newProduct.sku = existingProduct.sku;
+      //   newProduct.supplier = user.id;
+      //   await newProduct.save();
+      // } else {
+      //   newProduct = new this.prodModel();
+      // }
+      const newProduct = new this.prodModel(createProductDto);
+      if (existingProduct) {
+        newProduct.sku = existingProduct.sku;
+        newProduct.supplier = user.id;
+      } else {
+        newProduct.sku = newSKU;
+        newProduct.supplier = user.id;
+      }
     } catch (err) {
       return err;
     }
