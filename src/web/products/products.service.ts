@@ -25,18 +25,19 @@ export class ProductsService {
       if (!existingSupplier) {
         throw new BadRequestException(ERR_MSGS.SUPPLIER_NOT_FOUND);
       }
+      console.log('existingSupplier', existingSupplier);
       const prodName = createProductDto.name;
       const suppName = existingSupplier.name;
       const catName = createProductDto.category;
-      const sku = (prodName, suppName, catName) => {
+      const sku = (prodName: string, suppName: string, catName: string) => {
         const data = `${prodName}-${suppName}-${catName}`;
         const hash = crypto.createHash('sha256').update(data).digest('hex');
-        console.log(typeof hash);
-        // const prefix = hash.substr(0, 8);
-        // const suffix = hash.substr(-8);
-        // return `${prefix}-${suffix}`;
-        return hash;
+        const prefix = hash.substring(0, 8);
+        const suffix = hash.substring(hash.length - 8);
+        return `${prefix}-${suffix}`;
       };
+      const newSKU = sku(prodName, suppName, catName);
+      console.log(newSKU);
     } catch (err) {
       return err;
     }
