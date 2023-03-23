@@ -18,5 +18,6 @@ import { BlackList, BlackListSchema } from 'src/schemas/blacklist.schema';
   ],
   controllers: [SuppliersController],
   providers: [SuppliersService, JwtService, JwtHelper],
+  exports: [SuppliersService],
 })
 export class SuppliersModule {}
