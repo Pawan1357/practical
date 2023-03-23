@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Product, ProductDocument } from 'src/schemas/products.schema';
 import {
   CreateProductDto,
@@ -8,7 +8,7 @@ import {
 } from './../../dto/create-product.dto';
 import * as crypto from 'crypto';
 import { Supplier, SupplierDocument } from 'src/schemas/suppliers.schema';
-import { ERR_MSGS } from 'src/utils/consts';
+import { ERR_MSGS, SUCCESS_MSGS } from 'src/utils/consts';
 
 @Injectable()
 export class ProductsService {
@@ -19,13 +19,12 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto, user: SupplierDocument) {
     try {
-      console.log('createProductDto', createProductDto);
-
-      const existingSupplier = await this.suppModel.findOne({ _id: user?.id });
+      const existingSupplier = await this.suppModel.findOne({
+        $and: [{ _id: user?.id }, { deleted: false }],
+      });
       if (!existingSupplier) {
         throw new BadRequestException(ERR_MSGS.SUPPLIER_NOT_FOUND);
       }
-      console.log('existingSupplier', existingSupplier);
       const prodName = createProductDto.name;
       const suppName = existingSupplier.name;
       const catName = createProductDto.category;
@@ -37,45 +36,157 @@ export class ProductsService {
         return `${prefix}-${suffix}`;
       };
       const newSKU = sku(prodName, suppName, catName);
-      console.log(newSKU);
-      const existingProduct = await this.prodModel.findOne({ sku: newSKU });
-      console.log('existingProduct', existingProduct);
-
-      // let newProduct: ProductDocument;
-      // if (existingProduct) {
-      //   newProduct = new this.prodModel(createProductDto);
-      //   newProduct.sku = existingProduct.sku;
-      //   newProduct.supplier = user.id;
-      //   await newProduct.save();
-      // } else {
-      //   newProduct = new this.prodModel();
-      // }
+      const existingSku = await this.prodModel.findOne({
+        $and: [{ sku: newSKU }, { deleted: false }],
+      });
       const newProduct = new this.prodModel(createProductDto);
-      if (existingProduct) {
-        newProduct.sku = existingProduct.sku;
+      if (existingSku) {
+        newProduct.sku = existingSku.sku;
         newProduct.supplier = user.id;
+        newProduct.createdAt = new Date();
       } else {
         newProduct.sku = newSKU;
         newProduct.supplier = user.id;
+        newProduct.createdAt = new Date();
       }
+      await newProduct.save();
+      return { newProduct, message: SUCCESS_MSGS.PRODUCT_CREATED };
     } catch (err) {
       return err;
     }
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll() {
+    try {
+      const products = await this.prodModel.aggregate([
+        { $match: { deleted: false } },
+        {
+          $lookup: {
+            from: 'suppliers',
+            localField: 'supplier',
+            foreignField: '_id',
+            as: 'supplier',
+          },
+        },
+        {
+          $project: {
+            'supplier.password': 0,
+            'supplier.role': 0,
+            'supplier.forgetPwdToken': 0,
+            'supplier.forgetPwdExpires': 0,
+            'supplier.deleted': 0,
+            'supplier.createdAt': 0,
+            'supplier.__v': 0,
+            deleted: 0,
+            __v: 0,
+            createdAt: 0,
+            updatedAt: 0,
+          },
+        },
+      ]);
+      return { products, message: SUCCESS_MSGS.FIND_ALL_PRODUCTS };
+    } catch (err) {
+      return err;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+    try {
+      const existingProduct = await this.prodModel.aggregate([
+        { $match: { deleted: false } },
+        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        {
+          $lookup: {
+            from: 'suppliers',
+            localField: 'supplier',
+            foreignField: '_id',
+            as: 'supplier',
+          },
+        },
+        {
+          $project: {
+            'supplier.password': 0,
+            'supplier.role': 0,
+            'supplier.forgetPwdToken': 0,
+            'supplier.forgetPwdExpires': 0,
+            'supplier.deleted': 0,
+            'supplier.createdAt': 0,
+            'supplier.__v': 0,
+            deleted: 0,
+            __v: 0,
+            createdAt: 0,
+            updatedAt: 0,
+          },
+        },
+      ]);
+      // const existingProduct = await this.prodModel.find({
+      //   $and: [{ _id: id }, { deleted: false }],
+      // });
+      // if (!existingProduct) {
+      //   throw new BadRequestException(ERR_MSGS.PRODUCT_NOT_FOUND);
+      // }
+      // console.log('existingProduct', existingProduct[0].price);
+
+      return { existingProduct, message: SUCCESS_MSGS.FOUND_ONE_PRODUCT };
+    } catch (err) {
+      return err;
+    }
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    user: SupplierDocument,
+  ) {
+    try {
+      const existingProduct = await this.prodModel.findOne({
+        $and: [{ _id: id }, { supplier: user.id }, { deleted: false }],
+      });
+      if (!existingProduct) {
+        throw new BadRequestException(ERR_MSGS.PRODUCT_NOT_FOUND);
+      }
+      const updatedProduct = await this.prodModel.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            name: updateProductDto?.name,
+            description: updateProductDto?.description,
+            category: updateProductDto?.category,
+            price: updateProductDto?.price,
+            updatedAt: new Date(),
+          },
+        },
+        { deleted: 0, new: true },
+      );
+      // console.log('updatedProduct', updatedProduct.toJSON());
+
+      return { updatedProduct, message: SUCCESS_MSGS.UPDATED_PRODUCT };
+    } catch (err) {
+      return err;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string, user: SupplierDocument) {
+    try {
+      const existingProduct = await this.prodModel.findOne({
+        $and: [
+          { deleted: false },
+          { _id: new mongoose.Types.ObjectId(id) },
+          { supplier: new mongoose.Types.ObjectId(user.id) },
+        ],
+      });
+      if (!existingProduct) {
+        throw new BadRequestException(ERR_MSGS.PRODUCT_NOT_FOUND);
+      }
+      await this.prodModel.findOneAndUpdate(
+        {
+          _id: new mongoose.Types.ObjectId(id),
+        },
+        { $set: { deleted: true } },
+      );
+      return SUCCESS_MSGS.PRODUCT_DELETED;
+    } catch (err) {
+      return err;
+    }
   }
 }

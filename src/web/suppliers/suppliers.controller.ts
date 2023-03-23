@@ -20,6 +20,8 @@ import { JwtAuthGuard } from 'src/guards/jwtAuthGuard.guard';
 import { Users } from 'src/decorators/user.decorator';
 import { SupplierDocument } from 'src/schemas/suppliers.schema';
 import { Jwt } from 'src/decorators/jwt.decorator';
+import RoleGuard from 'src/guards/roleGuard.guard';
+import Role from 'src/utils/consts';
 
 @Controller('suppliers')
 export class SuppliersController {
@@ -52,6 +54,12 @@ export class SuppliersController {
     @Query('token') token: string,
   ) {
     return await this.suppliersService.reset(resetPassDetails, user, token);
+  }
+
+  @Get('findAll')
+  @UseGuards(RoleGuard(Role.Supplier))
+  async findAll() {
+    return await this.suppliersService.findAll();
   }
 
   @Get('logOut')

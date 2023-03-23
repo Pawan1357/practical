@@ -9,15 +9,18 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import {
   CreateProductDto,
   UpdateProductDto,
 } from './../../dto/create-product.dto';
-import { JwtAuthGuard } from 'src/guards/jwtAuthGuard.guard';
 import { Users } from 'src/decorators/user.decorator';
 import { SupplierDocument } from 'src/schemas/suppliers.schema';
+import RoleGuard from 'src/guards/roleGuard.guard';
+import Role from 'src/utils/consts';
+import { ValidateObjectId } from 'src/utils/utils';
 
 @Controller('products')
 export class ProductsController {
@@ -25,7 +28,7 @@ export class ProductsController {
 
   @Post('create')
   @UsePipes(ValidationPipe)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RoleGuard(Role.Supplier))
   async create(
     @Body() createProductDto: CreateProductDto,
     @Users() user: SupplierDocument,
@@ -33,23 +36,35 @@ export class ProductsController {
     return this.productsService.create(createProductDto, user);
   }
 
-  @Get()
-  findAll() {
+  @Get('findAll')
+  @UseGuards(RoleGuard(Role.Supplier))
+  async findAll() {
     return this.productsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  @Get('findOne/:id')
+  @UseGuards(RoleGuard(Role.Supplier))
+  async findOne(@Param('id', new ValidateObjectId()) id: string) {
+    return this.productsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  @Patch('update/:id')
+  @UsePipes(ValidationPipe)
+  @UseGuards(RoleGuard(Role.Supplier))
+  async update(
+    @Param('id', new ValidateObjectId()) id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @Users() user: SupplierDocument,
+  ) {
+    return this.productsService.update(id, updateProductDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  @UseGuards(RoleGuard(Role.Supplier))
+  async remove(
+    @Param('id', new ValidateObjectId()) id: string,
+    @Users() user: SupplierDocument,
+  ) {
+    return this.productsService.remove(id, user);
   }
 }

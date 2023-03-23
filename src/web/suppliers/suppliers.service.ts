@@ -36,7 +36,14 @@ export class SuppliersService {
   async create(createSupplierDto: CreateSupplierDto) {
     try {
       const existingSupplier = await this.suppModel.findOne({
-        email: createSupplierDto.email,
+        $and: [
+          {
+            email: createSupplierDto.email,
+          },
+          {
+            deleted: false,
+          },
+        ],
       });
       if (existingSupplier && existingSupplier.deleted == false) {
         throw new BadRequestException(ERR_MSGS.EMAIL_ALREADY_USED);
@@ -182,6 +189,43 @@ export class SuppliersService {
         { $sort: { _id: -1 } },
       ]);
       return existingToken;
+    } catch (err) {
+      return err;
+    }
+  }
+
+  async findAll() {
+    try {
+      const existingSuppliers = await this.suppModel.aggregate([
+        { $match: { deleted: false } },
+        {
+          $lookup: {
+            from: 'products',
+            localField: '_id',
+            foreignField: 'supplier',
+            as: 'products',
+          },
+        },
+        {
+          $project: {
+            password: 0,
+            role: 0,
+            forgetPwdToken: 0,
+            forgetPwdExpires: 0,
+            deleted: 0,
+            createdAt: 0,
+            __v: 0,
+            'products.deleted': 0,
+            'products.__v': 0,
+            'products.createdAt': 0,
+            'products.updatedAt': 0,
+          },
+        },
+      ]);
+      if (!existingSuppliers) {
+        throw new BadRequestException(ERR_MSGS.PRODUCT_NOT_FOUND);
+      }
+      return existingSuppliers;
     } catch (err) {
       return err;
     }

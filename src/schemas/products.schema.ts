@@ -1,34 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Supplier } from './suppliers.schema';
+import { priceOptions } from 'src/utils/consts';
 
 export type ProductDocument = HydratedDocument<Product>;
 
-@Schema()
+@Schema({ _id: false })
 export class Price {
-  @Prop({
-    type: Number,
-    get: (v: number) => (v / 100).toFixed(2),
-    set: (v: number) => v * 100,
-  })
+  @Prop(priceOptions)
   inr: number;
 
-  @Prop({
-    type: Number,
-    get: (v: number) => (v / 100).toFixed(2),
-    set: (v: number) => v * 100,
-  })
+  @Prop(priceOptions)
   euro: number;
 
-  @Prop({
-    type: Number,
-    get: (v: number) => (v / 100).toFixed(2),
-    set: (v: number) => v * 100,
-  })
+  @Prop(priceOptions)
   usd: number;
 }
 
 export const PriceSchema = SchemaFactory.createForClass(Price);
+PriceSchema.set('toObject', { getters: true });
 PriceSchema.set('toJSON', { getters: true });
 
 @Schema()
@@ -42,7 +32,7 @@ export class Product {
   @Prop({ required: true })
   category: string;
 
-  @Prop({ type: Price, required: true })
+  @Prop({ type: Price, required: true, index: false })
   price: Price;
 
   @Prop({ default: false })
@@ -63,4 +53,6 @@ export class Product {
 
 const ProductSchema = SchemaFactory.createForClass(Product);
 ProductSchema.index({ name: 'text' });
+PriceSchema.set('toObject', { getters: true });
+PriceSchema.set('toJSON', { getters: true });
 export { ProductSchema };
