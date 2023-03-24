@@ -42,5 +42,5 @@ export const SUCCESS_MSGS = {
 export const priceOptions = {
   type: Number,
   set: (v: number) => v * 100,
-  get: (v: number) => +v + 'asdf',
+  get: (v: number) => (v / 100).toFixed(2),
 };

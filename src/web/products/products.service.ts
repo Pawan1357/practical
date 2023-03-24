@@ -92,41 +92,18 @@ export class ProductsService {
 
   async findOne(id: string) {
     try {
-      const existingProduct = await this.prodModel.aggregate([
-        { $match: { deleted: false } },
-        { $match: { _id: new mongoose.Types.ObjectId(id) } },
-        {
-          $lookup: {
-            from: 'suppliers',
-            localField: 'supplier',
-            foreignField: '_id',
-            as: 'supplier',
+      const existingProduct = await this.prodModel
+        .findOne(
+          {
+            $and: [{ deleted: false }, { _id: id }],
           },
-        },
-        {
-          $project: {
-            'supplier.password': 0,
-            'supplier.role': 0,
-            'supplier.forgetPwdToken': 0,
-            'supplier.forgetPwdExpires': 0,
-            'supplier.deleted': 0,
-            'supplier.createdAt': 0,
-            'supplier.__v': 0,
-            deleted: 0,
-            __v: 0,
-            createdAt: 0,
-            updatedAt: 0,
-          },
-        },
-      ]);
-      // const existingProduct = await this.prodModel.find({
-      //   $and: [{ _id: id }, { deleted: false }],
-      // });
-      // if (!existingProduct) {
-      //   throw new BadRequestException(ERR_MSGS.PRODUCT_NOT_FOUND);
-      // }
-      // console.log('existingProduct', existingProduct[0].price);
-
+          { deleted: 0, __v: 0, createdAt: 0, updatedAt: 0 },
+        )
+        .populate({
+          path: 'supplier',
+          select:
+            '-password -role -forgetPwdToken -forgetPwdExpires -deleted -createdAt -__v',
+        });
       return { existingProduct, message: SUCCESS_MSGS.FOUND_ONE_PRODUCT };
     } catch (err) {
       return err;
@@ -156,10 +133,8 @@ export class ProductsService {
             updatedAt: new Date(),
           },
         },
-        { deleted: 0, new: true },
+        { new: true, projection: { deleted: 0, __v: 0, updatedAt: 0 } },
       );
-      // console.log('updatedProduct', updatedProduct.toJSON());
-
       return { updatedProduct, message: SUCCESS_MSGS.UPDATED_PRODUCT };
     } catch (err) {
       return err;

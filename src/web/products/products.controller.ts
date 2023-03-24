@@ -9,7 +9,6 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import {
