@@ -206,7 +206,6 @@ export class SuppliersService {
             as: 'products',
           },
         },
-        // { $set:{'products.price.inr':}},
         {
           $project: {
             password: 0,
