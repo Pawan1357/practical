@@ -58,32 +58,6 @@ export class ProductsService {
 
   async findAll() {
     try {
-      // const products = await this.prodModel.aggregate([
-      //   { $match: { deleted: false } },
-      //   {
-      //     $lookup: {
-      //       from: 'suppliers',
-      //       localField: 'supplier',
-      //       foreignField: '_id',
-      //       as: 'supplier',
-      //     },
-      //   },
-      //   {
-      //     $project: {
-      //       'supplier.password': 0,
-      //       'supplier.role': 0,
-      //       'supplier.forgetPwdToken': 0,
-      //       'supplier.forgetPwdExpires': 0,
-      //       'supplier.deleted': 0,
-      //       'supplier.createdAt': 0,
-      //       'supplier.__v': 0,
-      //       deleted: 0,
-      //       __v: 0,
-      //       createdAt: 0,
-      //       updatedAt: 0,
-      //     },
-      //   },
-      // ]);
       const products = await this.prodModel
         .find(
           { deleted: false },
