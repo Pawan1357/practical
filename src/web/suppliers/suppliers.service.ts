@@ -223,7 +223,7 @@ export class SuppliersService {
         },
       ]);
       if (!existingSuppliers) {
-        throw new BadRequestException(ERR_MSGS.PRODUCT_NOT_FOUND);
+        throw new BadRequestException(ERR_MSGS.SUPPLIER_NOT_FOUND);
       }
       return existingSuppliers;
     } catch (err) {

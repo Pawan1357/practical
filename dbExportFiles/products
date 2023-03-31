@@ -1,0 +1,88 @@
+[{
+  "_id": {
+    "$oid": "641bf78952bb69dd294cfddd"
+  },
+  "name": "bat",
+  "description": "season bat",
+  "category": "sports",
+  "price": {
+    "inr": 20000,
+    "euro": 2000000,
+    "usd": 2000000
+  },
+  "deleted": true,
+  "sku": "d4441425-9586fc9a",
+  "supplier": {
+    "$oid": "641ad78cf4e5b436cfab5141"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": {
+      "$numberLong": "1679629671168"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "641bf79a52bb69dd294cfde2"
+  },
+  "name": "ball",
+  "description": "cork ball",
+  "category": "sports",
+  "price": {
+    "inr": 10000,
+    "euro": 10000,
+    "usd": 10000
+  },
+  "deleted": false,
+  "sku": "d4441425-9586fc9a",
+  "supplier": {
+    "$oid": "641ad78cf4e5b436cfab5141"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "641bf807f68e6b2ae15934b5"
+  },
+  "name": "ball",
+  "description": "cork ball",
+  "category": "sports",
+  "price": {
+    "inr": 10000,
+    "euro": 10000,
+    "usd": 10000
+  },
+  "deleted": false,
+  "sku": "d4441425-9586fc9a",
+  "supplier": {
+    "$oid": "641ad78cf4e5b436cfab5141"
+  },
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1679554567334"
+    }
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "641c34d159d2afb241ae39bc"
+  },
+  "name": "badminton",
+  "description": "cosco",
+  "category": "sports",
+  "price": {
+    "inr": 100,
+    "euro": -400,
+    "usd": -400
+  },
+  "deleted": false,
+  "sku": "fc9d481a-1ef3d0ea",
+  "supplier": {
+    "$oid": "641ad78cf4e5b436cfab5141"
+  },
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1679570129177"
+    }
+  },
+  "__v": 0
+}]

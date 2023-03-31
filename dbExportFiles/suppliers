@@ -1,0 +1,37 @@
+[{
+  "_id": {
+    "$oid": "641ad72625777f61094b167d"
+  },
+  "name": "Pawan",
+  "email": "pawan@yopmail.com",
+  "password": "$2b$10$M439OxQwi6QWJGX9W1rSauYwI/j9GqpOmP.iZWmUg6wqfvbgz1THe",
+  "address": "ahmedabad",
+  "role": "Supplier",
+  "forgetPwdToken": null,
+  "forgetPwdExpires": null,
+  "deleted": false,
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1679480614055"
+    }
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "641ad78cf4e5b436cfab5141"
+  },
+  "name": "Ujjval",
+  "email": "ujjval@yopmail.com",
+  "password": "$2b$10$szr2go5PkvPOkwW6tIrcNuMfjJciNDTHpuRLmWrbyQjkau7MTLgy2",
+  "address": "ahmedabad",
+  "role": "Supplier",
+  "forgetPwdToken": null,
+  "forgetPwdExpires": null,
+  "deleted": false,
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1679480667350"
+    }
+  },
+  "__v": 0
+}]

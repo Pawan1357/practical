@@ -45,18 +45,17 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+## SetUp
 
-```bash
-# unit tests
-$ npm run test
+Afte running npm install, import the db files attached to the repo in local mongodb using mongo cli or compass.
+The files contains test data for testing the apis. A .env file will also be added as shown below which will contain the JWT secret and mailer configuration.
 
-# e2e tests
-$ npm run test:e2e
+JWT_SECRET = secret
+SENDINBLUE_HOST = YOUR_HOST
+SENDINBLUE_USERNAME = YOUR_USERNAME
+SENDINBLUE_PWD = YOUR_PASSWORD
 
-# test coverage
-$ npm run test:cov
-```
+You can add your details to the .env for security reasons. After all the all the steps the project is ready for testing.
 
 ## Support
 
